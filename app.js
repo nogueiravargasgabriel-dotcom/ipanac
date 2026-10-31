@@ -1099,10 +1099,10 @@ async function createEducator() {
       senha: String(values.get('senha') || '')
     };
 
-    const { data, error } = await db.functions.invoke(
-      'admin-criar-educador',
-      { body: payload }
-    );
+const { data, error } = await db.functions.invoke(
+  'clever-task',
+  { body: payload }
+);
 
     if (error) {
       console.error('Erro ao chamar Edge Function:', error);
