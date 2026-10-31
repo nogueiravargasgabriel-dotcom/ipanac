@@ -4,7 +4,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://ipanac-nine.vercel.app",
 ]);
 
-function corsHeaders(origin: string | null): Record<string, string> {
+function makeCorsHeaders(origin: string | null): Record<string, string> {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type",
@@ -27,7 +27,7 @@ function jsonResponse(
   return new Response(JSON.stringify(body), {
     status,
     headers: {
-      ...corsHeaders(origin),
+      ...makeCorsHeaders(origin),
       "Content-Type": "application/json; charset=utf-8",
     },
   });
@@ -35,37 +35,29 @@ function jsonResponse(
 
 Deno.serve(async (req: Request): Promise<Response> => {
   const origin = req.headers.get("Origin");
-  const headers = corsHeaders(origin);
+  const corsHeaders = makeCorsHeaders(origin);
 
-  // Responder ao preflight antes de autenticação ou leitura do corpo.
+  // O preflight precisa ser aceito antes de autenticação ou leitura do corpo.
   if (req.method === "OPTIONS") {
     if (origin && !ALLOWED_ORIGINS.has(origin)) {
       return new Response("Origem não permitida.", {
         status: 403,
-        headers,
+        headers: corsHeaders,
       });
     }
 
     return new Response("ok", {
       status: 200,
-      headers,
+      headers: corsHeaders,
     });
   }
 
   if (origin && !ALLOWED_ORIGINS.has(origin)) {
-    return jsonResponse(
-      { error: "Origem não permitida." },
-      403,
-      origin,
-    );
+    return jsonResponse({ error: "Origem não permitida." }, 403, origin);
   }
 
   if (req.method !== "POST") {
-    return jsonResponse(
-      { error: "Método não permitido." },
-      405,
-      origin,
-    );
+    return jsonResponse({ error: "Método não permitido." }, 405, origin);
   }
 
   try {
@@ -76,7 +68,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
       console.error(
         "Configuração ausente: SUPABASE_URL ou NAC_SERVICE_ROLE_KEY.",
       );
-
       return jsonResponse(
         { error: "Configuração da função incompleta." },
         500,
@@ -111,13 +102,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
       },
     });
 
-    // Confirma que o token recebido pertence a um usuário autenticado.
+    // Confirma a identidade do usuário que chamou a função.
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.getUser(accessToken);
 
     if (authError || !authData.user) {
       console.error("Falha ao validar sessão:", authError?.message);
-
       return jsonResponse(
         { error: "Sessão inválida ou expirada." },
         401,
@@ -125,7 +115,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Verifica a autorização no banco; não confia em dados enviados pelo navegador.
+    // A autorização é conferida no banco, não em dados enviados pelo navegador.
     const { data: adminProfile, error: profileError } = await supabaseAdmin
       .from("usuarios")
       .select("id, role")
@@ -134,7 +124,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     if (profileError) {
       console.error("Falha ao consultar perfil:", profileError.message);
-
       return jsonResponse(
         { error: "Não foi possível verificar a permissão do usuário." },
         500,
@@ -199,7 +188,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
 
     // Cria a conta no Supabase Auth.
-    const { data: createdUserData, error: createUserError } =
+    const { data: createdAuth, error: createAuthError } =
       await supabaseAdmin.auth.admin.createUser({
         email,
         password: senha,
@@ -207,23 +196,22 @@ Deno.serve(async (req: Request): Promise<Response> => {
         user_metadata: { nome },
       });
 
-    if (createUserError || !createdUserData.user) {
-      console.error(
-        "Falha ao criar conta no Auth:",
-        createUserError?.message,
-      );
-
+    if (createAuthError || !createdAuth.user) {
+      console.error("Falha ao criar usuário Auth:", createAuthError?.message);
       return jsonResponse(
-        { error: createUserError?.message || "Não foi possível criar a conta." },
+        {
+          error: createAuthError?.message ||
+            "Não foi possível criar a conta do educador.",
+        },
         400,
         origin,
       );
     }
 
-    const newUser = createdUserData.user;
+    const newUser = createdAuth.user;
 
-    // Um trigger pode já ter criado o perfil. O upsert evita erro de duplicidade.
-    const { data: profile, error: upsertError } = await supabaseAdmin
+    // O upsert também funciona quando um trigger já criou o perfil.
+    const { data: profile, error: profileSaveError } = await supabaseAdmin
       .from("usuarios")
       .upsert(
         {
@@ -237,27 +225,27 @@ Deno.serve(async (req: Request): Promise<Response> => {
       .select("id, nome, email, role")
       .single();
 
-    if (upsertError || !profile) {
+    if (profileSaveError || !profile) {
       console.error(
-        "Falha ao criar ou atualizar perfil:",
-        upsertError?.message,
+        "Falha ao salvar perfil do educador:",
+        profileSaveError?.message,
       );
 
-      // Remove a conta Auth criada para não deixar um usuário sem perfil válido.
+      // Rollback para não deixar uma conta Auth sem o perfil correspondente.
       const { error: deleteError } =
         await supabaseAdmin.auth.admin.deleteUser(newUser.id);
 
       if (deleteError) {
         console.error(
-          "Falha ao desfazer a criação da conta:",
+          "Falha ao remover conta após erro no perfil:",
           deleteError.message,
         );
       }
 
       return jsonResponse(
         {
-          error: upsertError?.message ||
-            "A conta foi criada, mas não foi possível salvar o perfil.",
+          error: profileSaveError?.message ||
+            "Não foi possível salvar o perfil do educador.",
         },
         500,
         origin,
@@ -277,7 +265,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       origin,
     );
   } catch (error) {
-    console.error("Erro inesperado na função:", error);
+    console.error("Erro inesperado na Edge Function:", error);
 
     return jsonResponse(
       { error: "Erro inesperado ao cadastrar o educador." },
