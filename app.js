@@ -1285,10 +1285,7 @@ async function createEducator() {
       );
     }
 
-    const { data, error } = await db.functions.invoke(
-      'clever-task',
-      {
-        body: payload,
+    const { data, error } = await db.functions.invoke('clever-task', { body: payload });
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
