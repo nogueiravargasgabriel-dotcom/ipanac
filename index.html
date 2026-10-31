@@ -342,7 +342,8 @@
             <div>
               <h2 class="page-title">Planejamentos</h2>
               <p class="page-description">
-                Organize as atividades previstas para cada turma.
+                Consulte as atividades previstas para cada turma. As datas
+                planejadas liberam o registro de chamada.
               </p>
             </div>
 
@@ -382,14 +383,23 @@
               </p>
             </div>
 
-            <button
-              id="newStudentButton"
-              class="btn btn-primary admin-only"
-              type="button"
-              hidden
-            >
-              Cadastrar estudante
-            </button>
+            <div class="student-actions admin-only" hidden>
+              <button
+                id="newStudentButton"
+                class="btn btn-secondary"
+                type="button"
+              >
+                Cadastrar estudante
+              </button>
+
+              <button
+                id="newStudentsBulkButton"
+                class="btn btn-primary"
+                type="button"
+              >
+                Cadastrar lista
+              </button>
+            </div>
           </div>
 
           <div class="attendance-toolbar">
