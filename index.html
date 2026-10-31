@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#002B5C">
+  <title>NAC - Marista Ipanema</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="loginView" class="login-page">
+    <section class="login-brand-panel">
+      <div class="sidebar-brand">
+        <span class="brand-mark">NAC</span>
+        <div class="brand-copy">
+          <p class="brand-title">NAC - Marista Ipanema</p>
+          <span class="brand-subtitle">Gestão de Frequência e Planejamento</span>
+        </div>
+      </div>
+
+      <div class="login-message">
+        <h1>Gestão educacional em um só lugar.</h1>
+        <p>
+          Acompanhe turmas, planejamentos e frequência dos estudantes
+          do Núcleo de Atividades Complementares.
+        </p>
+      </div>
+
+      <footer class="login-footer">NAC - Marista Ipanema</footer>
+    </section>
+
+    <section class="login-form-panel">
+      <form id="loginForm" class="login-form">
+        <h2>Acessar o sistema</h2>
+        <p>Entre com sua conta do sistema.</p>
+
+        <div id="loginMessage" class="alert alert-danger mb-2" role="alert" hidden></div>
+
+        <label class="form-field">
+          <span class="form-label">E-mail</span>
+          <input
+            class="form-control"
+            type="email"
+            name="email"
+            autocomplete="username"
+            required
+          >
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Senha</span>
+          <input
+            class="form-control"
+            type="password"
+            name="senha"
+            autocomplete="current-password"
+            required
+          >
+        </label>
+
+        <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+
+        <p class="text-muted mt-2">
+          As contas são criadas pelo Admin Master dentro do sistema.
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <div id="appView" class="app-shell" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-mark">NAC</span>
+        <div class="brand-copy">
+          <p class="brand-title">NAC - Marista Ipanema</p>
+          <span class="brand-subtitle">Gestão de Frequência e Planejamento</span>
+        </div>
+      </div>
+
+      <nav id="sideNav" class="sidebar-nav" aria-label="Menu principal">
+        <span class="nav-section-label">Menu principal</span>
+
+        <a class="nav-link active" href="#dashboard" data-view="dashboard">
+          <span class="nav-icon">▦</span>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="#chamada" data-view="chamada">
+          <span class="nav-icon">✓</span>
+          <span>Chamada</span>
+        </a>
+        <a class="nav-link" href="#planejamentos" data-view="planejamentos">
+          <span class="nav-icon">▤</span>
+          <span>Planejamentos</span>
+        </a>
+        <a class="nav-link" href="#estudantes" data-view="estudantes">
+          <span class="nav-icon">♙</span>
+          <span>Estudantes</span>
+        </a>
+        <a class="nav-link admin-only" href="#turmas" data-view="turmas" hidden>
+          <span class="nav-icon">▧</span>
+          <span>Turmas e dias de aula</span>
+        </a>
+        <a class="nav-link admin-only" href="#usuarios" data-view="usuarios" hidden>
+          <span class="nav-icon">♧</span>
+          <span>Educadores</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutButton" class="btn btn-secondary btn-block" type="button">
+          Sair do sistema
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-heading">
+          <h1 id="topbarTitle" class="topbar-title">Dashboard</h1>
+          <p class="topbar-caption">Sistema de Gestão de Frequência e Planejamento</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="user-chip">
+            <span id="userAvatar" class="user-avatar">N</span>
+            <span>
+              <span id="userName">Usuário</span><br>
+              <span id="userRole" class="text-muted">Perfil</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div id="globalMessage" class="alert alert-info mb-2" role="status" hidden></div>
+
+        <section id="view-dashboard" class="spa-view">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Visão geral</h2>
+              <p class="page-description">
+                Indicadores de frequência e acompanhamento pedagógico.
+              </p>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="card kpi-card">
+              <p class="kpi-label">Estudantes ativos</p>
+              <p id="kpiStudents" class="kpi-value">—</p>
+              <p class="kpi-note">Nas turmas disponíveis</p>
+            </article>
+            <article class="card kpi-card">
+              <p class="kpi-label">Frequência média</p>
+              <p id="kpiAttendance" class="kpi-value">—</p>
+              <p class="kpi-note">Presenças sobre registros</p>
+            </article>
+            <article class="card kpi-card">
+              <p class="kpi-label">Chamadas realizadas</p>
+              <p id="kpiLessons" class="kpi-value">—</p>
+              <p class="kpi-note">Registros de aula</p>
+            </article>
+            <article class="card kpi-card">
+              <p class="kpi-label">Planejamentos cumpridos</p>
+              <p id="kpiPlans" class="kpi-value">—</p>
+              <p class="kpi-note">Planejamentos realizados</p>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="card">
+              <div class="card-header">
+                <h3 class="card-title">Chamadas recentes</h3>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Turma</th>
+                      <th>Professor</th>
+                      <th>Registros</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentLessonsBody"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-header">
+                <h3 class="card-title">Radar de busca ativa</h3>
+              </div>
+              <div id="activeSearchList" class="card-body alert-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-chamada" class="spa-view" hidden>
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Chamada diária</h2>
+              <p class="page-description">
+                Selecione a turma e a data da aula para registrar a frequência.
+              </p>
+            </div>
+            <button id="exportCsvButton" class="btn btn-secondary" type="button">
+              Exportar CSV
+            </button>
+          </div>
+
+          <form id="attendanceForm" class="card">
+            <div class="card-body">
+              <div class="attendance-toolbar">
+                <label class="form-field">
+                  <span class="form-label">Turma</span>
+                  <select id="attendanceClass" class="form-control"></select>
+                </label>
+
+                <label class="form-field">
+                  <span class="form-label">Data da aula</span>
+                  <input id="attendanceDate" class="form-control" type="date" required>
+                </label>
+
+                <label class="form-field">
+                  <span class="form-label">Planejamento aplicado</span>
+                  <select id="attendancePlan" class="form-control">
+                    <option value="">Sem planejamento vinculado</option>
+                  </select>
+                </label>
+              </div>
+
+              <div id="scheduledDayNotice" class="alert alert-info mb-2" hidden></div>
+              <div id="attendanceNotice" class="alert alert-warning mb-2" hidden></div>
+
+              <label class="form-field mb-2">
+                <span class="form-label">Conteúdo ministrado / observações</span>
+                <textarea id="attendanceNotes" class="form-control"></textarea>
+              </label>
+
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Estudante</th>
+                      <th>Matrícula</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attendanceStudentsBody"></tbody>
+                </table>
+              </div>
+
+              <p class="text-muted mt-2">P: presente · F: falta · A: atraso · J: justificada</p>
+
+              <button id="saveAttendanceButton" class="btn btn-primary mt-2" type="submit">
+                Salvar chamada
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section id="view-planejamentos" class="spa-view" hidden>
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Planejamentos</h2>
+              <p class="page-description">Organize as atividades previstas para cada turma.</p>
+            </div>
+            <button id="newPlanButton" class="btn btn-primary" type="button">
+              Novo planejamento
+            </button>
+          </div>
+
+          <article class="card">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Data prevista</th>
+                    <th>Turma</th>
+                    <th>Título</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="plansBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="view-estudantes" class="spa-view" hidden>
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Estudantes</h2>
+              <p class="page-description">Consulte estudantes e sua frequência nas turmas.</p>
+            </div>
+            <button id="newStudentButton" class="btn btn-primary admin-only" type="button" hidden>
+              Cadastrar estudante
+            </button>
+          </div>
+
+          <div class="attendance-toolbar">
+            <label class="form-field">
+              <span class="form-label">Filtrar por turma</span>
+              <select id="studentClassFilter" class="form-control">
+                <option value="">Todas as minhas turmas</option>
+              </select>
+            </label>
+          </div>
+
+          <article class="card">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Estudante</th>
+                    <th>Matrícula</th>
+                    <th>Turmas</th>
+                    <th>Frequência</th>
+                    <th class="admin-only" hidden>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="view-turmas" class="spa-view" hidden>
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Turmas e dias de aula</h2>
+              <p class="page-description">
+                Crie turmas, atribua o educador titular e configure os dias previstos.
+              </p>
+            </div>
+            <button id="newClassButton" class="btn btn-primary" type="button">
+              Criar turma
+            </button>
+          </div>
+
+          <article class="card">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Turma</th>
+                    <th>Modalidade</th>
+                    <th>Professor titular</th>
+                    <th>Dias de aula</th>
+                    <th>Ano letivo</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="classesBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="view-usuarios" class="spa-view" hidden>
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Educadores</h2>
+              <p class="page-description">
+                Crie contas de educador. Novos educadores recebem o perfil Professor.
+              </p>
+            </div>
+            <button id="newUserButton" class="btn btn-primary" type="button">
+              Cadastrar educador
+            </button>
+          </div>
+
+          <article class="card">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Perfil</th>
+                  </tr>
+                </thead>
+                <tbody id="usersBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalRoot"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
