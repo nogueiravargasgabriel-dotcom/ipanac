@@ -1100,24 +1100,20 @@ async function createEducator() {
     };
 
 const { data, error } = await db.functions.invoke(
-  'clever-task',
-  { body: payload }
-);
+      'clever-task',
+      { body: payload }
+    );
 
     if (error) {
       console.error('Erro ao chamar Edge Function:', error);
-
       let detail = error.message || 'Falha ao chamar a Edge Function.';
 
-      // O corpo da resposta pode conter a mensagem específica do servidor.
-      if (error.context instanceof Response) {
+      // Tenta ler o JSON de erro retornado pela Edge Function
+      if (error.context && typeof error.context.json === 'function') {
         try {
-          const responseBody = await error.context.clone().json();
-          detail += ` Detalhe: ${responseBody.error || JSON.stringify(responseBody)}`;
-          detail += ` (HTTP ${error.context.status})`;
-        } catch {
-          detail += ` (HTTP ${error.context.status})`;
-        }
+          const body = await error.context.json();
+          if (body?.error) detail = body.error;
+        } catch (_) {}
       }
 
       throw new Error(detail);
