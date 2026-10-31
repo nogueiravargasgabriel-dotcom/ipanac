@@ -4,7 +4,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_GyS2P9k07rKFr7rWJOzWIQ_LOACEUZz';
 
 const db = window.supabase.createClient(
   SUPABASE_URL,
-   SUPABASE_ANON_KEY
+   SUPABASE_ANON_KEY,
   );
 
 const WEEKDAYS = [
