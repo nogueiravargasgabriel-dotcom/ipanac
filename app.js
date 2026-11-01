@@ -1397,6 +1397,10 @@ $('#newStudentButton').addEventListener('click', () => {
   createStudent().catch(reportError);
 });
 
+$('#newStudentsBulkButton').addEventListener('click', () => {
+  createStudentsBulk().catch(reportError);
+});
+
 $('#newPlanButton').addEventListener('click', () => {
   createPlan().catch(reportError);
 });
