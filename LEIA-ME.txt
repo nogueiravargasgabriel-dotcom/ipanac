@@ -1,0 +1,9 @@
+SUBSTITUIR:
+- app.js                          -> raiz do site (Vercel), substitui o atual
+- login-usuario_index.ts          -> cole no index.ts da função login-usuario
+- clever-task_index.ts            -> cole no index.ts da função clever-task
+- trocar-senha-inicial_index.ts   -> cole no index.ts da função trocar-senha-inicial
+- config.toml                     -> supabase/config.toml (só se publicar pela CLI)
+
+NO PAINEL DO SUPABASE (Edge Functions), nas 3 funções:
+desligar "Verify JWT" e fazer Deploy.
